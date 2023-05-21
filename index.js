@@ -8,9 +8,27 @@ window.addEventListener("load", () => {
     context.fillStyle = "black";
     context.fillRect(0, 0, canvas.width, canvas.height);
     const center = [canvas.width * 0.5, canvas.height * 0.5];
+    const MAX_COUNT = 100000;
+    const RADIUS = 500;
     const Pentagon = [];
     let count = 0;
-    let DP, NP;
+    let DrawPoint, NewPoint;
+
+    const maxPosition = center[0] + RADIUS;
+    const minPosition = center[0] - RADIUS;
+
+    const gradientColor = (position) => {
+        const normalizedPosition = (position - minPosition) / (maxPosition - minPosition);
+        const r = Math.round((1 - normalizedPosition) * 255);
+        const g = Math.round(normalizedPosition * 255);
+        const b = 0;
+
+        const hexR = r.toString(16).padStart(2, '0');
+        const hexG = g.toString(16).padStart(2, '0');
+        const hexB = b.toString(16).padStart(2, '0');
+
+        return `#${hexR}${hexG}${hexB}`;
+    }
     const findPentagonVertices = (radius) => {
         let arg, x, y;
         for (let k = 0; k < 5; k++) {
@@ -65,7 +83,8 @@ window.addEventListener("load", () => {
     }
     const drawParticle = (startingPoint, endPoint) => {
         count++;
-        if (count > 100000) return;
+        context.fillStyle = "#A0E3F6";
+        if (count > MAX_COUNT) return;
         let endingPoint;
         if (endPoint === null) {
             endingPoint = findEndingPoint(startingPoint)
@@ -74,16 +93,17 @@ window.addEventListener("load", () => {
             endingPoint = endPoint;
         };
         let drawnPoint = findHalfway(Pentagon[startingPoint] ?? startingPoint, Pentagon[endingPoint]);
+        context.fillStyle = gradientColor(drawnPoint[0]);
         context.fillRect(drawnPoint[0], drawnPoint[1], 1, 1);
         let newPoint = chooseNewPoint(endingPoint);
-        DP = drawnPoint; NP = newPoint;
+        DrawPoint = drawnPoint; NewPoint = newPoint;
     }
     const animate = (timestamp) => {
-        drawParticle(DP, NP);
+        console.log(count);
+        drawParticle(DrawPoint, NewPoint);
         requestAnimationFrame(animate);
     }
-    context.fillStyle = "red";
-    findPentagonVertices(500);
+    findPentagonVertices(RADIUS);
     drawParticle(0, null);
     animate(0);
 })

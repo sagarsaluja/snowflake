@@ -11,17 +11,17 @@ window.addEventListener("load", () => {
     const MAX_COUNT = 100000;
     const RADIUS = 500;
     const Pentagon = [];
-    let count = 0;
-    let DrawPoint, NewPoint;
+    let COUNT = 0;
+    let DRAWPOINT, NEWPOINT;
 
     const maxPosition = center[0] + RADIUS;
     const minPosition = center[0] - RADIUS;
 
     const gradientColor = (position) => {
         const normalizedPosition = (position - minPosition) / (maxPosition - minPosition);
-        const r = Math.round((1 - normalizedPosition) * 255);
-        const g = Math.round(normalizedPosition * 255);
-        const b = 0;
+        const r = 0;
+        const g = Math.round((1 - normalizedPosition) * 255);
+        const b = Math.round(normalizedPosition * 255);
 
         const hexR = r.toString(16).padStart(2, '0');
         const hexG = g.toString(16).padStart(2, '0');
@@ -70,8 +70,6 @@ window.addEventListener("load", () => {
         do {
             endingPoint = Math.floor(10 * Math.random()) % 5
         } while (endingPoint === startingPoint);
-        if (endingPoint === startingPoint) {
-        }
         return endingPoint;
     }
     const chooseNewPoint = (endingPoint) => {
@@ -82,26 +80,19 @@ window.addEventListener("load", () => {
         return newPoint;
     }
     const drawParticle = (startingPoint, endPoint) => {
-        count++;
-        context.fillStyle = "#A0E3F6";
-        if (count > MAX_COUNT) return;
-        let endingPoint;
-        if (endPoint === null) {
-            endingPoint = findEndingPoint(startingPoint)
-        }
-        else {
-            endingPoint = endPoint;
-        };
-        let drawnPoint = findHalfway(Pentagon[startingPoint] ?? startingPoint, Pentagon[endingPoint]);
+        COUNT++;
+        const endingPoint = endPoint ?? findEndingPoint(startingPoint);
+        const drawnPoint = findHalfway(Pentagon[startingPoint] ?? startingPoint, Pentagon[endingPoint]);
         context.fillStyle = gradientColor(drawnPoint[0]);
         context.fillRect(drawnPoint[0], drawnPoint[1], 1, 1);
-        let newPoint = chooseNewPoint(endingPoint);
-        DrawPoint = drawnPoint; NewPoint = newPoint;
+        const newPoint = chooseNewPoint(endingPoint);
+        DRAWPOINT = drawnPoint;
+        NEWPOINT = newPoint;
     }
-    const animate = (timestamp) => {
-        console.log(count);
-        drawParticle(DrawPoint, NewPoint);
-        requestAnimationFrame(animate);
+    const animate = () => {
+        console.log(COUNT);
+        drawParticle(DRAWPOINT, NEWPOINT);
+        if (COUNT < MAX_COUNT) requestAnimationFrame(animate);
     }
     findPentagonVertices(RADIUS);
     drawParticle(0, null);
